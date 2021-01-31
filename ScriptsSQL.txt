@@ -1,0 +1,27 @@
+Create Table Usuario(
+	document_id varchar(255) NOT NULL,
+	nombre varchar(255) NOT NULL,
+	username varchar(255) NOT NULL,
+	pass varchar(255) NOT NULL,
+	PRIMARY KEY (document_id)
+);
+
+CREATE TABLE account(
+	numero numeric NOT NULL,
+	current_balance numeric NOT NULL,
+	fk_usuario varchar(255) NOT NULL,
+	PRIMARY KEY (numero),
+	FOREIGN KEY (fk_usuario) REFERENCES Usuario(document_id)
+);
+
+CREATE TABLE transactions(
+	id_transac numeric NOT NULL,
+	amount numeric NOT NULL,
+	fecha date NOT NULL,
+	description varchar(255) NOT NULL,
+	fk_account_envio numeric,
+	fk_account_recibo numeric,
+	PRIMARY KEY (id_transac),
+	FOREIGN KEY (fk_account_envio) REFERENCES account(numero),
+	FOREIGN KEY (fk_account_recibo) REFERENCES account(numero)
+);
