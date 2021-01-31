@@ -67,11 +67,44 @@ public class App {
                                 String document_id = rs.getString("document_id");
                                 System.out.println(document_id);
 
-                                //Si el input es igual a la info de la base de datos
-                                if(documento == document_id){
-                                    System.out.println("El usuario existe");
+                                //Verificar si el input es igual a la info de la base de datos
+                                if(documento.equals(document_id)){
+                                    //String con el query
+                                    query = "SELECT count(numero) as num FROM account, usuario WHERE fk_usuario = document_id AND document_id = ?;";
+                                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                                    preparedStatement.setString(1, documento);
+                                    rs = preparedStatement.executeQuery();
+                                    rs.next();
 
-                                }else{
+                                    if (rs.getInt("num") == 3){
+                                        System.out.println("Usted ya posee el limite de cuentas");
+                                        System.out.println(rs.getInt("num"));
+                                        preparedStatement.close();
+                                        break;
+                                    }else{
+                                        System.out.println("Crear nueva cuenta");
+                                        System.out.print("Nombre de usuario: ");
+                                        String usuario = input.nextLine();
+                                        System.out.print("Contraseña: ");
+                                        String contrasena = input.nextLine();
+                                        query = "SELECT username, pass FROM usuario WHERE document_id = ?";
+                                        preparedStatement = connection.prepareStatement(query);
+                                        preparedStatement.setString(1, documento);
+                                        rs = preparedStatement.executeQuery();
+                                        rs.next();
+                                        
+                                        
+                                        if((rs.getString("username").equals(usuario)) & (rs.getString("pass").equals(contrasena))){
+                                            System.out.println("Cuenta creada");
+                                        }else{
+                                            System.out.println("Las credenciales son invalidas");
+                                        }
+
+                                        preparedStatement.close();
+
+                                    }
+
+                                }else if((document_id != documento) & (rs.isLast())){
                                     System.out.println("El numero de documento no existe");
                                     System.out.println("Crear nuevo usuario");
                                     System.out.print("Nombre: ");
@@ -95,15 +128,13 @@ public class App {
                                     preparedStatement.execute();
 
                                     System.out.println("Usuario creado satisfactoriamente");
-
+                                    preparedStatement.close();
                                 }
                             }
 
                             //Cerramos el statement
+                            rs.close();
                             st.close();
-
-                            //Cerramso la conexion con la base de datos
-                            connection.close();
                             
                                     break;
                     case 2: System.out.println("Opción 2 ---");
@@ -111,6 +142,7 @@ public class App {
                     case 3: System.out.println("Opción 3 ---");
                                     break;
                     case 4: System.out.println("Salir ---");
+                    connection.close();
                                     break;
                     default : break;
                 }
